@@ -451,12 +451,8 @@ func updateUserdataFile(driverOpts *rpcdriver.RPCFlags, machineName, hostname, u
 // on how hostnames are set in cloud-config (userdata)
 func writeCloudConfig(machineName, encodedData, machineOS, hostname string, cf map[interface{}]interface{}, newUserDataFile *os.File) error {
 	command := "sh"
-	path := "/usr/local/custom_script/install.sh"
+	path := "/var/run/install.sh"
 	key := "hostname"
-	// allow the script to work on distros with read-only /usr partitions
-	if strings.Contains(machineOS, "coreos") || strings.Contains(machineOS, "coreos") {
-		path = "/var/run/install.sh"
-	}
 	if strings.Contains(machineOS, "windows") {
 		// the writeFile path should ideally be C:\usr\local\custom_script\install.ps1
 		// however, we can't guarantee that directory exists or can be created on the target machine
@@ -475,6 +471,7 @@ func writeCloudConfig(machineName, encodedData, machineOS, hostname string, cf m
 		}
 		log.Debugf("[writeCloudConfig] wrote %s field for %s machine %s", key, machineOS, machineName)
 	}
+	log.Infof("[writeCloudConfig] workaround in place for %s machine %s", machineOS, machineName)
 	return commonCloudConfig(encodedData, command, path, cf, newUserDataFile)
 }
 
